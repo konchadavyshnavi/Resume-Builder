@@ -44,7 +44,7 @@ const TemplateSelector = ({ selectedTemplate, onChange }) => {
 
       {isOpen && (
         <div
-          className="absolute top-full mt-2 w-72 p-3 space-y-3 z-10
+          className="absolute top-full mt-2 w-75 p-3 space-y-3 z-10
           bg-white rounded-md border border-gray-200 shadow-sm"
         >
           {templates.map((template) => (
