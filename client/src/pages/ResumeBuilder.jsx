@@ -1,15 +1,21 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { dummyResumeData } from "../assets/assets";
-import { ArrowLeftIcon } from "lucide-react";
+import { ArrowLeftIcon, Download, EyeIcon, EyeOffIcon } from "lucide-react";
 import { User, FileText, Briefcase, FolderOpen, Sparkles } from "lucide-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import PersonalInForm from "../components/PersonalInForm";
 import ResumePreview from "../components/ResumePreview";
 import TemplateSelector from "../components/TemplateSelector";
 import ColorPicker from "../components/ColorPicker";
-
-
+import ProfessionalSummary from "../components/ProfessionalSummary";
+import ExperienceForm from "../components/ExperienceForm";
+import EducationForm from "../components/EducationForm";
+import ProjectForm from "../components/ProjectForm";
+import { BookOpen } from "lucide-react";
+import SkillsForm from "../components/SkillsForm";
+import { Share2Icon
+ } from "lucide-react";
 const ResumeBuilder = () => {
   const { resumeId } = useParams();
 
@@ -39,10 +45,10 @@ const ResumeBuilder = () => {
 
   const sections = [
     { id: "personal", name: "Personal  Info", icon: User },
-    { id: "Summary", name: "Summary", icon: FileText },
-    { id: "Experience", name: "Experience", icon: Briefcase },
-    // {id:"Education",name:"Education",icon:BookOpen},
-    { id: "Projects", name: "Projects", icon: FolderOpen },
+    { id: "summary", name: "Summary", icon: FileText },
+    { id: "experience", name: "Experience", icon: Briefcase },
+    {id:"education",name:"Education",icon:BookOpen},
+    { id: "projects", name: "Projects", icon: FolderOpen },
     { id: "skills", name: "Skills", icon: Sparkles },
   ];
   const activeSection = sections[activeSectionIndex];
@@ -50,7 +56,30 @@ const ResumeBuilder = () => {
   useEffect(() => {
     loadExistingResume();
   }, []);
+const changeResumeVisibility=async()=>{
+  setResumeData({...resumeData,public: !resumeData.public})
+}
+const handleShare = async () => { 
+  const frontendUrl = window.location.origin;
+  const resumeUrl = frontendUrl + '/view/' + resumeId;
 
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        url: resumeUrl,
+        text: "My Resume",
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  } else {
+    alert('share not supported on this browser');
+  }
+};
+
+const downloadResume=()=>{
+  window.print();
+}
   return (
     <div>
       <div className="max-w-7xl mx-auto px-4 py-6">
@@ -122,21 +151,119 @@ const ResumeBuilder = () => {
           </div>
             {/*Form Content */}
           <div className='space-y-6'>
-           {activeSection.id==='personal' &&(
+           {
+           activeSection.id==='personal' &&(
             <PersonalInForm  data={resumeData.personal_info}
             onChange={(data)=>setResumeData(prev=>({
               ...prev,personal_info:data
             }))} removeBackground={removeBackground}
          setRemoveBackground={setRemoveBackground}
-         />)}
+         />)
+         }
+         {
+          activeSection.id==='summary' && (
+            <div>
+              <ProfessionalSummary data={resumeData.professional_summary}
+              onChange={(data)=>setResumeData(prev=>(
+                {
+                  ...prev,professional_summary:data
+                }
+              ))} setResumeDara={setResumeData}/>
+            </div>
+          )
+         }
+          {
+          activeSection.id==='experience' && (
+            <div>
+              <ExperienceForm data={resumeData.experience}
+              onChange={(data)=>setResumeData(prev=>(
+                {
+                  ...prev,experience:data
+                }
+              ))} />
+            </div>
+          )
+         }
+          {
+          activeSection.id==='education' && (
+            <div>
+              <EducationForm data={resumeData.education}
+              onChange={(data)=>setResumeData(prev=>(
+                {
+                  ...prev,education:data
+                }
+              ))} />
+            </div>
+          )
+         }
+         {
+          activeSection.id==='projects' && (
+            <div>
+              <ProjectForm data={resumeData.project}
+              onChange={(data)=>setResumeData(prev=>(
+                {
+                  ...prev,project:data
+                }
+              ))} />
+            </div>
+          )
+         }
+{
+          activeSection.id==='skills' && (
+            <div>
+              <SkillsForm data={resumeData.skills}
+              onChange={(data)=>setResumeData(prev=>(
+                {
+                  ...prev,skills:data
+                }
+              ))} />
+            </div>
+          )
+         }
           </div>
+          <button className='bg-gradient-to-br from-green-100 to-green-200
+          ring-green-300 text-green-600 ring hover:ring-green-400
+          transition-all rounded-md px-6 py-2 mt-6 text-sm'>
+            Save Changes
+          </button>
             </div>
           </div>
           {/* Right panel form*/}
 
           <div className='lg:col-span-7 max-lg:mt-6'>
-            <div>
-              {/*button--*/}
+            <div className='relative w-full'>
+              <div className='absolute bottom-3 left-0 right-0 flex items-center
+              justify-end gap-2'>
+                {
+                  resumeData.public &&(
+                    <button className='flex items-center p-2 px-4 gap-2 text-xs
+bg-gradient-to-br from-blue-100 to-blue-200 text-blue-600
+rounded-lg ring-blue-300 hover: ring transition-colors'
+onClick={handleShare}>
+<Share2Icon className='size-4'/>share
+</button>
+                  )
+                }
+               <button onClick={changeResumeVisibility} className='flex items-center p-2 px-4 gap-2
+text-xs bg-gradient-to-br from-purple-100 to-purple-200
+text-purple-600 ring-purple-300 rounded-1g hover:ring
+transition-colors'>
+                  {
+                    resumeData.public ? <EyeIcon className='size-4'/> :
+                    <EyeOffIcon className='size-4'/>
+                  }
+                  {
+                    resumeData.public ?"Public" :"Private"
+                  }
+                </button>
+                <button className='flex items-center gap-2 px-6 py-2 text-xs
+bg-gradient-to-br from-green-100 to-green-200 text-green-600
+rounded-lg ring-green-300 hover:ring transition-colors' onClick={downloadResume}>
+I<Download className='size-4'/>Dowload
+
+</button>
+              </div>
+            
             </div>
             <ResumePreview data={resumeData} template={resumeData.template} accentColor={resumeData.accent_color} classes="mx-auto shadow-lg"/>
 
