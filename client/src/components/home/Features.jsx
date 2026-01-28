@@ -11,7 +11,7 @@ export default function Features() {
                 }
             `}</style>
            
-            <div className="flex items-center  gap-2  mb-7 text-sm text-green-600 justify-center w-full md:w-1/2 lg:w-1/5 bg-green-400/10 rounded-full px-6 py-1.5 ">
+            <div className="flex items-center  gap-4  mb-7 text-sm text-green-600 justify-center w-full md:w-1/2 lg:w-1/5 bg-green-400/10 rounded-full px-6 py-1.5 ">
             <Zap width={14} />
             <span>simple process</span>
         </div>
