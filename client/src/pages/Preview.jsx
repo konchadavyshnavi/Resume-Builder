@@ -5,14 +5,21 @@ import ResumePreview from '../components/ResumePreview';
 import{ArrowLeftIcon} from 'lucide-react';
 import Loader from '../components/Loader';
 import { useState,useEffect } from 'react';
+import api from '../configs/api.js';
 
 const Preview = () => {
   const{resumeId}=useParams();
   const [isLoading,setLoading]=useState(true);
   const[resumeData,setResumeData]=useState(null);
   const loadResume=async()=>{
-    setResumeData(dummyResumeData.find(resume=>resume._id===resumeId ||null))
- setLoading(false)
+    try{
+    const{data}=await api.get(`/api/resumes/public/${resumeId}`);
+    setResumeData(data.resume)
+    }catch(error){
+      console.error('Error fetching resume data:',error);
+    }finally{
+      setLoading(false);
+    }
   }
   useEffect(()=>{
  loadResume();
@@ -21,7 +28,7 @@ const Preview = () => {
     <div className='bg-slate-100'>
       <div className='max-w-3xl mx-auto py-10'>
         <ResumePreview data={resumeData} template={resumeData.template}
-        accentColor={resumeData.accemt_color} classes='py-4 bg-white'/>
+        accentColor={resumeData.accent_color} classes='py-4 bg-white'/>
 
       </div>
       

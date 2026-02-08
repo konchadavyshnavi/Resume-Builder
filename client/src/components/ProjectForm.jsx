@@ -2,6 +2,7 @@ import React from 'react'
 import { GraduationCap, Plus, Trash2, Sparkles } from 'lucide-react';
 
 const ProjectForm = ({data,onChange}) => {
+ 
    const addProject= () => {
          const newProject = {
             name: "",
@@ -20,6 +21,7 @@ const ProjectForm = ({data,onChange}) => {
          updated[index] = { ...updated[index], [field]: value };
          onChange(updated);
       };
+      
 
   return (
     <div>

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { dummyResumeData } from "../assets/assets";
 import { ArrowLeftIcon, Download, EyeIcon, EyeOffIcon } from "lucide-react";
 import { User, FileText, Briefcase, FolderOpen, Sparkles } from "lucide-react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -16,8 +15,12 @@ import { BookOpen } from "lucide-react";
 import SkillsForm from "../components/SkillsForm";
 import { Share2Icon
  } from "lucide-react";
+ import api from '../configs/api.js';
+ import { useSelector } from "react-redux";
+import { toast } from "react-hot-toast";
 const ResumeBuilder = () => {
   const { resumeId } = useParams();
+  const {token}=useSelector((state)=>state.auth)
 
   const [resumeData, setResumeData] = useState({
     _id: "",
@@ -26,18 +29,26 @@ const ResumeBuilder = () => {
     professional_summary: "",
     experience: [],
     education: [],
-    projects: [],
+    project: [],
     skills: [],
     template: "classic",
     accent_color: "#3B82f6",
     public: false,
   });
 
-  const loadExistingResume = () => {
-    const resume = dummyResumeData.find((r) => r._id === resumeId);
-    if (resume) {
-      setResumeData(resume);
-      document.title = resume.title || "Resume Builder";
+  const loadExistingResume = async() => {
+    try{
+      const {data}=await api.get(`/api/resumes/get/${resumeId}`,{
+        headers:{
+          Authorization: `Bearer ${token}`
+        }
+      })
+      if(data.resume){
+        setResumeData(data.resume)
+        document.title=data.resume.title;
+      }
+    }catch(error){
+      console.log(error)
     }
   };
   const [activeSectionIndex, setActiveSectionIndex] = useState(0);
@@ -57,7 +68,49 @@ const ResumeBuilder = () => {
     loadExistingResume();
   }, []);
 const changeResumeVisibility=async()=>{
-  setResumeData({...resumeData,public: !resumeData.public})
+  try{
+    const formData=new FormData();
+    formData.append("resumeId",resumeId);
+    formData.append("resumeData",JSON.stringify({public:!resumeData.public}));
+     const {data}=await api.put('/api/resumes/update',formData,{
+        headers:{
+          Authorization: `Bearer ${token}`
+        }
+      })
+       setResumeData({...resumeData,public: !resumeData.public})
+       toast.success(data.message);
+
+  }catch(error){
+  console.log("error saving in resume",error);
+
+  }
+}
+const saveResume=async()=>{
+  try{
+let updatedResumeData = JSON.parse(JSON.stringify(resumeData));
+
+ if(typeof resumeData.personal_info.image instanceof File){
+  delete updatedResumeData.personal_info.image;
+ }
+ const formData=new FormData();
+ formData.append("resumeId",resumeId);
+  formData.append("resumeData",JSON.stringify(updatedResumeData));
+  removeBackground && formData.append("removeBackground","yes");
+  formData.append("accent_color",resumeData.accent_color);
+  typeof resumeData.personal_info.image==='object' && formData.append("image",resumeData.personal_info.image);
+  const {data}=await api.put('/api/resumes/update',formData,{
+    headers:{
+      Authorization: `Bearer ${token}`
+    }
+  })
+  console.log(data.resume);
+  setResumeData(data.resume);
+    toast.success(data.message);
+  }catch(error){
+    console.error("error in saving in resume",error);
+    toast.error(error.response?.data?.message || "Error saving resume");
+
+  }
 }
 const handleShare = async () => { 
   const frontendUrl = window.location.origin;
@@ -168,7 +221,7 @@ const downloadResume=()=>{
                 {
                   ...prev,professional_summary:data
                 }
-              ))} setResumeDara={setResumeData}/>
+              ))} setResumeData={setResumeData}/>
             </div>
           )
          }
@@ -223,7 +276,9 @@ const downloadResume=()=>{
           </div>
           <button className='bg-gradient-to-br from-green-100 to-green-200
           ring-green-300 text-green-600 ring hover:ring-green-400
-          transition-all rounded-md px-6 py-2 mt-6 text-sm'>
+          transition-all rounded-md px-6 py-2 mt-6 text-sm' onClick={()=>{
+            toast.promise(saveResume,{loading:"saving"})
+          }}>
             Save Changes
           </button>
             </div>
@@ -232,8 +287,8 @@ const downloadResume=()=>{
 
           <div className='lg:col-span-7 max-lg:mt-6'>
             <div className='relative w-full'>
-              <div className='absolute bottom-3 left-0 right-0 flex items-center
-              justify-end gap-2'>
+              <div className='absolute bottom-3  flex items-center
+              justify-end gap-4 right-4 z-10'>
                 {
                   resumeData.public &&(
                     <button className='flex items-center p-2 px-4 gap-2 text-xs

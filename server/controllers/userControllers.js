@@ -1,8 +1,11 @@
 //POST:/api/users/register
 import User from "../models/user.js";
 import jwt from "jsonwebtoken"
+import bcrypt from "bcrypt"
+import Resume from "../models/Resume.js";
+
 const generateToken=(user)=>{
-   const token=jwt.sign({id:user._id},process.env.JWT_SECRET,{expiresIn:"7d"})
+   const token=jwt.sign({userId:user._id},process.env.JWT_SECRET,{expiresIn:"7d"})
    return token;
 }
 export const register=async(req,res)=>{
@@ -62,5 +65,18 @@ export const getUserById=async(req,res)=>{
       
    }catch(error){
       return res.status(400).json({message:error.message})
+   }
+}
+//controller for user resume/
+//get:/api/users/resumes
+export const getUserResumes=async(req,res)=>{
+   try{
+  const userId=req.userId;
+  //return user resumes
+  const resumes=await Resume.find({userId})
+  return res.status(200).json({resumes});
+
+   }catch(error){
+
    }
 }

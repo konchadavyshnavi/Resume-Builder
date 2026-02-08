@@ -6,8 +6,8 @@ const UserSchema=new mongoose.Schema({
    email:{type:String,required:true,unique:true},
    password:{type:String,required:true}
 },{timestamps:true});
-UserSchema.methods.comparePassword-function(password){
-   return bcrypt.compare(password,this.password);
+UserSchema.methods.comparePassword=async function(password){
+   return await bcrypt.compare(password,this.password);
 }
 const User=mongoose.model("User",UserSchema);
 export default User;
