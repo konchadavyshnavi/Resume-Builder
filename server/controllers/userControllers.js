@@ -1,5 +1,5 @@
 //POST:/api/users/register
-import User from "../models/user.js";
+import User from "../models/User.js";
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 import Resume from "../models/Resume.js";
