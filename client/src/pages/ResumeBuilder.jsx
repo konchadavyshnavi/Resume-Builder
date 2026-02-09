@@ -181,7 +181,7 @@ const downloadResume=()=>{
                   disabled={activeSectionIndex === 0}
                   className="flex items-center gap-1 p-3 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 transition-all"
                 >
-                  perivous
+                  previous
                   <ChevronLeft className="size-4" />
                   
                 </button>
