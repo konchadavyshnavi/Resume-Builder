@@ -151,10 +151,7 @@ e.preventDefault();
           <UploadCloudIcon className="size-11 p-2.5 bg-gradient-to-br from-green-300 to-indigo-500 text-white rounded-full" />
           <p className="text-sm mt-2">
             
-          {isLoading && <LoaderCircleIcon className="size-5 mt-2 animate-spin text-green-600" />}
-          {
-            isLoading ? 'uploading..':'upload Resume'
-          }
+          Upload
           </p>
         </button>
       </div>
@@ -249,7 +246,10 @@ e.preventDefault();
             onClick={(e) => e.stopPropagation()}
             className="bg-white rounded-lg w-full max-w-sm p-6 relative"
           >
-            <h2 className="text-xl font-semibold mb-4">Upload Resume</h2>
+            <h2 className="text-xl font-semibold mb-4">{isLoading && <LoaderCircleIcon className="size-5 mt-2 animate-spin text-green-600" />}
+          {
+            isLoading ? 'uploading..':'Upload Resume'
+          }</h2>
 
             <input
               type="text"
